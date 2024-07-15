@@ -30,26 +30,20 @@ func (c *Test_OwnerApproveAction) Setup(t *testing.T, ctx context.Context, build
 func (c *Test_OwnerApproveAction) Run(t *testing.T, ctx context.Context, _ framework.BuildResult) {
 	client := TestGRPCClient(*c.w.GRPCClient(t))
 
-	users := TestUsers{
-		Alice:   User{Name: "alice", Key: "warden19u97f0928q306grmkpa7w5hpxcmtf625uzaqg9"},
-		Bob:     User{Name: "bob", Key: "warden1emghyenumveuu3jc5zgu7ny2zkcj2c5qm3l2g2"},
-		Charlie: User{Name: "charlie", Key: "warden14xaez22aa8wlk7zdrpv7ea0j9h2g2da9tutenp"},
-		Dave:    User{Name: "dave", Key: "warden1mx09erayrjxlwaj2tvfq9rqw7hxyypkzsc36vg"},
-	}
-
-	bob := users.Bob.client(c.w)
-	alice := users.Alice.client(c.w)
-	charlie := users.Charlie.client(c.w)
+	alice := exec.NewWardend(c.w, "alice")
+	bob := exec.NewWardend(c.w, "bob")
+	charlie := exec.NewWardend(c.w, "charlie")
+	dave := exec.NewWardend(c.w, "dave")
 
 	addNewOwnerCommandTemplate := "warden new-action add-space-owner --space-id %d --new-owner %s"
 
-	resAddOwner := bob.Tx(t, fmt.Sprintf(addNewOwnerCommandTemplate, 1, users.Bob.Key))
+	resAddOwner := bob.Tx(t, fmt.Sprintf(addNewOwnerCommandTemplate, 1, bob.Address(t)))
 	checks.SuccessTx(t, resAddOwner)
-	client.EnsureSpaceAmount(t, ctx, users.Bob.Key, 0)
+	client.EnsureSpaceAmount(t, ctx, bob.Address(t), 0)
 
 	resApproveBob := alice.Tx(t, "act approve-action --action-id 1")
 	checks.SuccessTx(t, resApproveBob)
-	client.EnsureSpaceAmount(t, ctx, users.Bob.Key, 1)
+	client.EnsureSpaceAmount(t, ctx, bob.Address(t), 1)
 
 	resNewRule := alice.Tx(t, "act new-rule --name approve_requires_two --definition \"any(2, warden.space.owners)\"")
 	checks.SuccessTx(t, resNewRule)
@@ -72,21 +66,21 @@ func (c *Test_OwnerApproveAction) Run(t *testing.T, ctx context.Context, _ frame
 	require.NoError(t, err)
 	require.Equal(t, uint64(1), spaceAfterValidApprove.Space.AdminRuleId)
 
-	resAliceAddOwnerCharlie := alice.Tx(t, fmt.Sprintf(addNewOwnerCommandTemplate, 1, users.Charlie.Key))
+	resAliceAddOwnerCharlie := alice.Tx(t, fmt.Sprintf(addNewOwnerCommandTemplate, 1, charlie.Address(t)))
 	checks.SuccessTx(t, resAliceAddOwnerCharlie)
-	client.EnsureSpaceAmount(t, ctx, users.Charlie.Key, 0)
+	client.EnsureSpaceAmount(t, ctx, charlie.Address(t), 0)
 
 	resApproveCharlie := bob.Tx(t, "act approve-action --action-id 4")
 	checks.SuccessTx(t, resApproveCharlie)
-	client.EnsureSpaceAmount(t, ctx, users.Charlie.Key, 1)
+	client.EnsureSpaceAmount(t, ctx, charlie.Address(t), 1)
 
-	resCharlieAddOwnerDave := charlie.Tx(t, fmt.Sprintf(addNewOwnerCommandTemplate, 1, users.Dave.Key))
+	resCharlieAddOwnerDave := charlie.Tx(t, fmt.Sprintf(addNewOwnerCommandTemplate, 1, dave.Address(t)))
 	checks.SuccessTx(t, resCharlieAddOwnerDave)
-	client.EnsureSpaceAmount(t, ctx, users.Dave.Key, 0)
+	client.EnsureSpaceAmount(t, ctx, dave.Address(t), 0)
 
 	resApproveDaveByBob := bob.Tx(t, "act approve-action --action-id 5")
 	checks.SuccessTx(t, resApproveDaveByBob)
-	client.EnsureSpaceAmount(t, ctx, users.Dave.Key, 1)
+	client.EnsureSpaceAmount(t, ctx, dave.Address(t), 1)
 }
 
 type TestGRPCClient exec.GRPCClient
@@ -97,20 +91,4 @@ func (client *TestGRPCClient) EnsureSpaceAmount(t *testing.T, ctx context.Contex
 	})
 	require.NoError(t, err)
 	require.Equal(t, amount, len(resSpacesByDaveAfterBobApprove.Spaces))
-}
-
-type TestUsers struct {
-	Alice   User
-	Bob     User
-	Charlie User
-	Dave    User
-}
-
-type User struct {
-	Name string
-	Key  string
-}
-
-func (u *User) client(node *exec.WardenNode) *exec.Wardend {
-	return exec.NewWardend(node, u.Name)
 }
