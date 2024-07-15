@@ -2,7 +2,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useMediaQuery } from "@uidotdev/usehooks";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Core } from "@walletconnect/core";
 import {
 	IWeb3Wallet,
@@ -16,12 +15,7 @@ import {
 	SessionTypes,
 } from "@walletconnect/types";
 import { AuthEngineTypes } from "@walletconnect/auth-client";
-import {
-	Accordion,
-	AccordionContent,
-	AccordionItem,
-	AccordionTrigger,
-} from "@/components/ui/accordion";
+
 import { fromHex } from "@cosmjs/encoding";
 import Web3 from "web3";
 import {
@@ -37,7 +31,6 @@ import SignRequestDialog from "@/components/SignRequestDialog";
 import { useAddressContext } from "@/hooks/useAddressContext";
 import { getClient, useQueryHooks } from "@/hooks/useClient";
 import * as Popover from "@radix-ui/react-popover";
-import { PowerIcon } from "lucide-react";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
 import { AddressType } from "@wardenprotocol/wardenjs/codegen/warden/warden/v1beta2/key";
@@ -47,7 +40,6 @@ import { useEthereumTx } from "@/hooks/useEthereumTx";
 import { getProvider } from "@/lib/eth";
 import { PageRequest } from "@wardenprotocol/wardenjs/codegen/cosmos/base/query/v1beta1/pagination";
 import { env } from "@/env";
-import MobileTransport from "./MobileTransport";
 import { useModalContext } from "@/context/modalContext";
 
 export function useWeb3Wallet(relayUrl: string) {
