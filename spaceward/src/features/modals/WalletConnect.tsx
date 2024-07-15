@@ -186,20 +186,14 @@ export default function WalletConnectModal() {
 				</div>
 			) : (
 				<div>
-					<MobileTransport
-						onData={(data) => {
-							setUri(Buffer.from(data).toString());
-						}}
-					/>
-
-					<div className="mt-12 mb-6 h-[1px] bg-border-quaternary" />
+					<div className="mb-6 h-[1px] bg-border-quaternary" />
 
 					<Accordion type="single" collapsible className="w-full">
 						<AccordionItem
 							value="item-1"
 							className="border-b-0 p-0"
 						>
-							<AccordionTrigger className="font-sans text-sm p-0">
+							<AccordionTrigger className="font-sans text-xl font-bold p-0">
 								How do I connect to a dApp?
 							</AccordionTrigger>
 							<AccordionContent className="pt-4">
@@ -216,6 +210,28 @@ export default function WalletConnectModal() {
 										Your dApp is now connected to SpaceWard
 									</li>
 								</ol>
+							</AccordionContent>
+						</AccordionItem>
+					</Accordion>
+
+					<Accordion
+						type="single"
+						collapsible
+						className="w-full mt-6"
+					>
+						<AccordionItem
+							value="item-1"
+							className="border-b-0 p-0"
+						>
+							<AccordionTrigger className="font-sans text-xl font-bold p-0">
+								If I don&apos;t have a paring code
+							</AccordionTrigger>
+							<AccordionContent className="pt-4">
+								<MobileTransport
+									onData={(data) => {
+										setUri(Buffer.from(data).toString());
+									}}
+								/>
 							</AccordionContent>
 						</AccordionItem>
 					</Accordion>

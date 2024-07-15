@@ -133,14 +133,10 @@ export default function MobileTransport(props: MobileTransportProps) {
 						<div className="p-1 bg-white overflow-hidden rounded-lg">
 							<QRCode value={openUrl} size={192} />
 						</div>
-						<div className="flex flex-col justify-center text-left leading-[125%]">
+						<div className="flex flex-col justify-center text-left leading-[125%] text-secondary-text">
 							<div className="text-xl	font-bold mb-2">
-								Or scan with your mobile
-							</div>
-							<div className="text-secondary-text">
-								Open SpaceWard access to the camera on your
-								mobile. Then go to the dApp and scan QR code for
-								connection.
+								Scan the QR and then follow the instructions
+								on&nbsp;your mobile
 							</div>
 						</div>
 					</a>
